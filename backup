@@ -1,0 +1,14 @@
+#!/usr/env/bin bash
+
+exec &>.logs
+
+# install applications
+pushd ./install_apps 
+./install
+popd
+
+# dock
+pushd dock
+./dock
+podp
+
