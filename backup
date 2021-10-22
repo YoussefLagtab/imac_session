@@ -1,6 +1,12 @@
-#!/usr/env/bin bash
+#!/usr/bin/env bash
 
-exec &>.logs
+log_file=~/.backup.log
+echo view logs: tail -F $log_file
+exec 1>>$log_file
+exec 2>>$log_file
+
+echo Started At: `Date`
+echo ---------------------------------------------------------------------------------
 
 # install applications
 pushd ./install_apps 
@@ -10,5 +16,6 @@ popd
 # dock
 pushd dock
 ./dock
-podp
+./dock
+popd
 
