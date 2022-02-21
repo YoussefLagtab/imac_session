@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-# set -e
+set -e
 
-# helpers
 function install_dmg() {
 	app=$1;
 	app_dmg=$2;
@@ -14,7 +13,6 @@ function install_dmg() {
 	mount_point=`echo $mount_output | grep -o /dev/\[a-z0-9\]*`;
 	mount_point=`echo $mount_point | cut -d' ' -f2`;
 
-	echo * copying *;
 	cp -R "$app_folder"/*.app "$app";
 
 	hdiutil unmount "$mount_point";
@@ -34,15 +32,12 @@ function install_app() {
 	url=$2;
 	app_pkg="$download_folder/$1";
 	app="$applications_folder/$1.app";
-
+ 	[ $force == true ] && rm -fr $app;
 	if [ ! -d "$app" ]
 	then
 		echo - Installing \|$1\| FROM \|$url\|;
 
 		curl -L "$url" > "$app_pkg";
-		echo "------------------"
-		echo `file $app_pkg | grep -io zip`;
-		echo "------------------"
 		if [[ ! -z `file $app_pkg | grep -i -ioE \(bzip\|zlib\)` ]]; then package_type=dmg;
 		elif [[ ! -z `file $app_pkg | grep -io zip` ]]; then package_type=zip;
 		else package_type=unk;
@@ -57,20 +52,26 @@ function install_app() {
 	fi;
 }
 
-
 # vars
 prefix=~/goinfre;
 applications_folder="$prefix/Applications";
 download_folder="$applications_folder/.downloads";
-requirements=./requirements.txt;
+apps=./apps.txt;
 
 mkdir -p $download_folder;
 
 # main
-for req in `cat $requirements`;
+force=false;
+while getopts 'f' opt; do
+	case $opt in
+		f) force=true && break;;
+		?) exit 0;;
+	esac;
+done
+
+for req in `cat $apps`;
 do
 	app_name=`echo $req | cut -d\: -f1`;
 	app_url=`echo $req | cut -d\: -f2-`;
-	echo install_app "$app_name" "$app_url";
 	install_app "$app_name" "$app_url";
 done

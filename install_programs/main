@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Rustlang
+echo \# installing Rustlang
+./rustlang &>/dev/null
+
+echo \# Done.

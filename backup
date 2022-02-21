@@ -1,21 +1,32 @@
 #!/usr/bin/env bash
 
+
+# started file
+started_file=~/.local/opt/imac_session/.started
+[ -f $started_file ] && echo "backup already running" && exit 1;
+touch $started_file
+
+
+# log file
 log_file=~/.backup.log
 echo view logs: tail -F $log_file
 exec 1>>$log_file
 exec 2>>$log_file
 
-echo Started At: `Date`
-echo ---------------------------------------------------------------------------------
 
-# install applications
-pushd ./install_apps 
-./install
-popd
+echo Started At: `date`
+echo ===========================================================================
 
-# dock
-pushd dock
-./dock
-./dock
-popd
+for task in `ls | grep -v backup`;
+do
+    echo \{$task\}
+    pushd $task
+    ./main
+    popd
+done
+rm $started_file
 
+echo End At: `date`
+echo ===========================================================================
+
+killall -u ylagtab
